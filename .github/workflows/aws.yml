@@ -33,11 +33,11 @@ on:
 env:
   AWS_REGION: us-east-2                  # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: project02_hackers/game           # set this to your Amazon ECR repository name
-  ECS_SERVICE: ecr                 # set this to your Amazon ECS service name
+  ECS_SERVICE: gameApp                 # set this to your Amazon ECS service name
   ECS_CLUSTER: Project02_HITB                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
                                                # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
+  CONTAINER_NAME: wordpress           # set this to the name of the container in the
                                                # containerDefinitions section of your task definition
 
 permissions:
