@@ -1,0 +1,54 @@
+{
+  "categories": [
+    {
+      "category": "Fruit",
+      "key_word": "apple",
+      "hints": ["red", "tree", "pie", "juice", "orchard", "sweet", "core", "cider", "crisp", "seed"]
+    },
+    {
+      "category": "Vehicle",
+      "key_word": "bicycle",
+      "hints": ["pedal", "wheels", "ride", "helmet", "handlebars", "brake", "chain", "gear", "seat", "spoke"]
+    },
+    {
+      "category": "Animal",
+      "key_word": "elephant",
+      "hints": ["trunk", "tusks", "large", "grey", "ears", "safari", "mammal", "ivory", "herd", "heavy"]
+    },
+    {
+      "category": "Instrument",
+      "key_word": "guitar",
+      "hints": ["strings", "music", "pick", "frets", "chords", "acoustic", "electric", "band", "strum", "amp"]
+    },
+    {
+      "category": "Planet",
+      "key_word": "mars",
+      "hints": ["red", "planet", "space", "rover", "dust", "orbit", "solar", "crater", "alien", "rock"]
+    },
+    {
+      "category": "Sport",
+      "key_word": "soccer",
+      "hints": ["ball", "goal", "kick", "field", "team", "referee", "net", "league", "stadium", "world cup"]
+    },
+    {
+      "category": "Country",
+      "key_word": "japan",
+      "hints": ["asia", "sushi", "tokyo", "island", "samurai", "mount fuji", "anime", "cherry blossom", "shinkansen", "kimono"]
+    },
+    {
+      "category": "Technology",
+      "key_word": "computer",
+      "hints": ["keyboard", "mouse", "screen", "processor", "memory", "software", "hardware", "internet", "program", "byte"]
+    },
+    {
+      "category": "Color",
+      "key_word": "purple",
+      "hints": ["violet", "royal", "grape", "lavender", "eggplant", "lilac", "magenta", "plum", "amethyst", "orchid"]
+    },
+    {
+      "category": "Profession",
+      "key_word": "doctor",
+      "hints": ["hospital", "patient", "medicine", "nurse", "surgery", "health", "clinic", "diagnose", "stethoscope", "cure"]
+    }
+  ]
+}

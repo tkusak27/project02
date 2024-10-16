@@ -1,3 +1,13 @@
 {{ define "base" }}
-<h1> Hello World! </h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" type="text/css" href="/public/style.css">
+</head>
+<body>
+{{template "body" .}}
+</body>
+</html>
+
 {{ end }}
