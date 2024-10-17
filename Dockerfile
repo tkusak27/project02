@@ -28,7 +28,7 @@ COPY --from=builder /app/main .
 # Copy the templates and public directories
 COPY --from=builder /app/templates ./templates
 # Uncomment the next line if you have a public directory
-# COPY --from=builder /app/public ./public
+COPY --from=builder /app/public ./public
 
 # Copy the words.json file
 COPY --from=builder /app/words.json .
