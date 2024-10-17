@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -69,30 +70,31 @@ func loadCategories() {
 
 // Preload 5 random sessions from the categories
 func preloadSessions(count int) {
-	rand.Seed(time.Now().UnixNano()) // Seed the random number generator
-
-	// Shuffle the categories to ensure uniqueness
+	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(categories), func(i, j int) {
 		categories[i], categories[j] = categories[j], categories[i]
 	})
 
-	// Use the first few categories to create sessions
+	var wg sync.WaitGroup
 	for i := 0; i < count && i < len(categories); i++ {
-		category := categories[i]
-		sessionID := fmt.Sprintf("preloaded-%d", i+1)
-
-		sessions[sessionID] = &Session{
-			Category:  category.Category,
-			KeyWord:   category.KeyWord,
-			Hints:     category.Hints,
-			HintIndex: 0,
-			Guesses:   []string{},
-			Won:       false,
-			ExpiresAt: time.Now().Add(10 * time.Minute),
-		}
-
-		log.Printf("Preloaded session %s: %s - %s", sessionID, category.Category, category.KeyWord)
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			category := categories[i]
+			sessionID := fmt.Sprintf("preloaded-%d", i+1)
+			sessions[sessionID] = &Session{
+				Category:  category.Category,
+				KeyWord:   category.KeyWord,
+				Hints:     category.Hints,
+				HintIndex: 0,
+				Guesses:   []string{},
+				Won:       false,
+				ExpiresAt: time.Now().Add(10 * time.Minute),
+			}
+			log.Printf("Preloaded session %s: %s - %s", sessionID, category.Category, category.KeyWord)
+		}(i)
 	}
+	wg.Wait() // Wait for all goroutines to complete
 }
 
 // Middleware for logging requests
