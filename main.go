@@ -50,6 +50,51 @@ type Session struct {
 	ExpiresAt time.Time
 }
 
+// Load word categories from words.json
+func loadCategories() {
+	file, err := os.Open("words.json")
+	if err != nil {
+		log.Fatalf("Failed to open words.json: %v", err)
+	}
+	defer file.Close()
+
+	var data struct {
+		Categories []Category `json:"categories"`
+	}
+	if err := json.NewDecoder(file).Decode(&data); err != nil {
+		log.Fatalf("Failed to decode words.json: %v", err)
+	}
+	categories = data.Categories
+}
+
+// Preload 5 random sessions from the categories
+func preloadSessions(count int) {
+	rand.Seed(time.Now().UnixNano()) // Seed the random number generator
+
+	// Shuffle the categories to ensure uniqueness
+	rand.Shuffle(len(categories), func(i, j int) {
+		categories[i], categories[j] = categories[j], categories[i]
+	})
+
+	// Use the first few categories to create sessions
+	for i := 0; i < count && i < len(categories); i++ {
+		category := categories[i]
+		sessionID := fmt.Sprintf("preloaded-%d", i+1)
+
+		sessions[sessionID] = &Session{
+			Category:  category.Category,
+			KeyWord:   category.KeyWord,
+			Hints:     category.Hints,
+			HintIndex: 0,
+			Guesses:   []string{},
+			Won:       false,
+			ExpiresAt: time.Now().Add(10 * time.Minute),
+		}
+
+		log.Printf("Preloaded session %s: %s - %s", sessionID, category.Category, category.KeyWord)
+	}
+}
+
 // Middleware for logging requests
 func logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -87,8 +132,11 @@ func index() http.Handler {
 // Function to get or create a session ID
 func getSessionID(w http.ResponseWriter, r *http.Request) string {
 	cookie, err := r.Cookie("session_id")
-	if err != nil {
-		sessionID := fmt.Sprintf("%d", rand.Int())
+	if err != nil { // No session ID, assign a preloaded session if available
+		sessionID := assignPreloadedSessionID()
+		if sessionID == "" { // No more preloaded sessions, generate a new one
+			sessionID = fmt.Sprintf("%d", rand.Int())
+		}
 		http.SetCookie(w, &http.Cookie{
 			Name:  "session_id",
 			Value: sessionID,
@@ -99,10 +147,21 @@ func getSessionID(w http.ResponseWriter, r *http.Request) string {
 	return cookie.Value
 }
 
+func assignPreloadedSessionID() string {
+	for id, session := range sessions {
+		if strings.HasPrefix(id, "preloaded-") && session.ExpiresAt.After(time.Now()) {
+			return id // Return the first available preloaded session
+		}
+	}
+	return "" // No valid preloaded session found
+}
+
 // Initialize a session
 func getSession(sessionID string) *Session {
 	session, exists := sessions[sessionID]
-	if !exists || session.Won || len(session.Guesses) >= 5 {
+
+	// If session doesn't exist, expired, or exhausted, assign a new one
+	if !exists || session.ExpiresAt.Before(time.Now()) || session.Won || len(session.Guesses) >= 5 {
 		category := categories[rand.Intn(len(categories))]
 		session = &Session{
 			Category:  category.Category,
@@ -192,21 +251,8 @@ func game() http.Handler {
 }
 
 func main() {
-	file, err := os.Open("words.json")
-	if err != nil {
-		log.Fatalf("Failed to open words.json: %v", err)
-	}
-	defer file.Close()
-
-	var data struct {
-		Categories []Category `json:"categories"`
-	}
-	if err := json.NewDecoder(file).Decode(&data); err != nil {
-		log.Fatalf("Failed to decode words.json: %v", err)
-	}
-	categories = data.Categories
-
-	rand.Seed(time.Now().UnixNano())
+	loadCategories()   // Load categories from words.json
+	preloadSessions(5) // Preload 5 random sessions
 
 	go startSessionCleanup(1 * time.Minute)
 
