@@ -1,127 +1,177 @@
+/* General styling for the body */
 body {
     font-family: Arial, sans-serif;
-    background-color: #ffffff;
+    background-color: #ecf0f1;
     color: #333333;
     margin: 0;
     padding: 0;
-}
-
-.container {
-    width: 90%;
-    margin: 0 auto;
-    text-align: center;
-    padding: 20px 0;
-}
-
-.game-area {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 20px;
-    padding: 10px; 
+    height: 100vh;
+    overflow: hidden; /* Prevent scrolling */
 }
 
-.side-panel {
-    width: 25%;
-    padding: 10px;
-    box-sizing: border-box;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-}
-
-.center-panel {
-    width: 40%;              /* Slightly reduce the width of the center panel */
-    padding: 20px;
-    box-sizing: border-box;
+/* Centralized container */
+.container {
+    width: 90%;
+    max-width: 800px;
     background-color: #ffffff;
-    border: 1px solid #ddd;   /* Light border to separate the center panel */
-    border-radius: 8px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
 }
 
-.center-panel h1 {
-    font-size: 2.5em;
-    margin-bottom: 20px;
-}
-
-.center-panel form {
-    margin-bottom: 20px;
-}
-
-.extra-hints {
+/* Game area with side panels on both sides */
+.game-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
     margin-top: 20px;
 }
 
-ul {
-    list-style-type: none;
+/* Side panels for hints and guesses */
+.side-panel {
+    flex: 1;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    padding: 15px;
+    box-sizing: border-box;
+    max-width: 30%;
+}
+
+.side-panel h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.side-panel ul {
+    list-style: none;
     padding: 0;
 }
 
 li {
-    text-align: left;
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
     margin: 5px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
+/* Center panel for game content */
+.center-panel {
+    flex: 2;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin: 0 10px;
+    text-align: center;
+}
+
+.center-panel h1 {
+    font-size: 1.7rem;
+    margin-bottom: 10px;
+}
+
+.center-panel form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Input fields */
 input[type="text"] {
-    width: 90%;              /* Increase the width for a more centered feel */
+    width: 80%;
+    max-width: 300px;
     padding: 12px;
     font-size: 18px;
-    border-radius: 5px;      /* Rounded corners for a modern look */
     border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 0 auto;
+    text-align: center; /* Horizontal centering */
+
+    /* Vertical centering */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.5;
 }
 
 input[type="submit"] {
-    padding: 12px 24px;
+    padding: 12px;
     font-size: 18px;
     background-color: #3498db;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 10px;
+    transition: background-color 0.3s;
 }
 
 input[type="submit"]:hover {
     background-color: #2980b9;
 }
 
-h1, h2, h3 {
-    color: #2c3e50;
+/* Visual representation of attempts */
+.circles {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
 }
 
-h2 {
-    margin-bottom: 10px;
+.circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #3498db;
 }
 
-a {
-    color: #3498db;
-    text-decoration: none;
+.circle.empty {
+    background-color: #ecf0f1;
 }
 
-a:hover {
-    text-decoration: underline;
-}
-
-/* Make sure lists look uniform */
-ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-li {
-    text-align: left;
-    margin: 5px 0;
-    background-color: #f4f4f4;
-    padding: 10px;
+/* Play button styling */
+.play-button {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 18px;
+    background-color: #3498db;
+    color: white;
     border-radius: 5px;
+    margin-top: 20px;
+    transition: background-color 0.3s;
 }
 
+.play-button:hover {
+    background-color: #2980b9;
+}
+
+/* Responsive layout adjustments */
 @media (max-width: 768px) {
     .game-area {
         flex-direction: column;
         align-items: center;
     }
-    .side-panel, .center-panel {
-        width: 100%;
+
+    .side-panel {
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .center-panel {
+        margin: 0;
     }
 }

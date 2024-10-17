@@ -10,7 +10,7 @@
     {{if .Won}}
     <h1>Congratulations!</h1>
     <p>You guessed the word "<strong>{{.KeyWord}}</strong>" correctly!</p>
-    <a href="/game">Play Again</a>
+    <a href="/game" class="play-button">Play Again</a>
     {{else if lt .Attempts .MaxAttempts}}
     <div class="game-area">
         <!-- Hints on the left -->
@@ -31,22 +31,24 @@
                 <input type="submit" value="Guess">
             </form>
 
-            <!-- Extra hints section if applicable -->
-            {{if .ExtraHints}}
-            <div class="extra-hints">
-                <h3>Extra Hints:</h3>
-                <ul>
-                    {{range .ExtraHints}}
-                    <li>{{.}}</li>
-                    {{end}}
-                </ul>
+            <!-- Visual representation of remaining guesses -->
+            <div class="attempts-visual">
+                <div class="circles">
+                    {{ $remaining := sub .MaxAttempts .Attempts }}
+                    {{ range $i, $ := until .MaxAttempts }}
+                    {{ if lt $i $remaining }}
+                    <span class="circle filled"></span> <!-- Visible circle -->
+                    {{ else }}
+                    <span class="circle empty"></span> <!-- Invisible circle -->
+                    {{ end }}
+                    {{ end }}
+                </div>
             </div>
-            {{end}}
         </div>
 
         <!-- Guesses on the right -->
         <div class="side-panel guesses">
-            <h2>Your Guesses</h2>
+            <h2>Guesses</h2>
             <ul>
                 {{range .Guesses}}
                 <li>{{.}}</li>
@@ -54,13 +56,14 @@
             </ul>
         </div>
     </div>
-    <p>Attempt {{.Attempts}} of {{.MaxAttempts}}</p>
+
     {{else}}
     <h1>Game Over</h1>
     <p>Sorry, you've used all attempts. The word was "<strong>{{.KeyWord}}</strong>".</p>
-    <a href="/game">Play Again</a>
+    <a href="/game" class="play-button">Play Again</a>
     {{end}}
 </div>
+
 </body>
 </html>
 {{end}}

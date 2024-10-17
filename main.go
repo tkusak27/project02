@@ -8,14 +8,21 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
-// Global variables and structures
 var (
 	funcMap = template.FuncMap{
 		"sub": func(a, b int) int {
 			return a - b
+		},
+		"until": func(count int) []int {
+			nums := make([]int, count)
+			for i := 0; i < count; i++ {
+				nums[i] = i
+			}
+			return nums
 		},
 	}
 	templates = template.Must(template.New("").Funcs(funcMap).ParseFiles(
@@ -34,16 +41,16 @@ type Category struct {
 }
 
 type Session struct {
-	Category   string
-	KeyWord    string
-	Hints      []string
-	HintIndex  int
-	Guesses    []string
-	Won        bool
-	ExtraHints []string
+	Category  string
+	KeyWord   string
+	Hints     []string
+	HintIndex int
+	Guesses   []string
+	Won       bool
+	ExpiresAt time.Time
 }
 
-// Middleware for logging requests and response times
+// Middleware for logging requests
 func logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
@@ -62,32 +69,19 @@ func public() http.Handler {
 // Handler for the homepage
 func index() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		b := struct {
+		data := struct {
 			Title        template.HTML
 			BusinessName string
 			Slogan       string
 		}{
-			Title:        template.HTML("Business &verbar; Landing"),
-			BusinessName: "Business,",
-			Slogan:       "we get things done.",
+			Title:        template.HTML("Word Guessing Game"),
+			BusinessName: "Welcome to the Word Guessing Game!",
+			Slogan:       "Test your vocabulary and have fun!",
 		}
-		err := templates.ExecuteTemplate(w, "base", &b)
-		if err != nil {
+		if err := templates.ExecuteTemplate(w, "base", &data); err != nil {
 			http.Error(w, fmt.Sprintf("index: couldn't parse template: %v", err), http.StatusInternalServerError)
-			return
 		}
 	})
-}
-
-// Function to generate a clue for the target word
-func getClue(word string) string {
-	// Show the first and last letters, and underscores for the rest
-	clue := string(word[0])
-	for i := 1; i < len(word)-1; i++ {
-		clue += "_"
-	}
-	clue += string(word[len(word)-1])
-	return clue
 }
 
 // Function to get or create a session ID
@@ -108,21 +102,35 @@ func getSessionID(w http.ResponseWriter, r *http.Request) string {
 // Initialize a session
 func getSession(sessionID string) *Session {
 	session, exists := sessions[sessionID]
-	if !exists || session.Won || len(session.Guesses) >= 20 {
-		// Start a new session
+	if !exists || session.Won || len(session.Guesses) >= 5 {
 		category := categories[rand.Intn(len(categories))]
 		session = &Session{
-			Category:   category.Category,
-			KeyWord:    category.KeyWord,
-			Hints:      category.Hints,
-			HintIndex:  0,
-			Guesses:    []string{},
-			Won:        false,
-			ExtraHints: []string{},
+			Category:  category.Category,
+			KeyWord:   category.KeyWord,
+			Hints:     category.Hints,
+			HintIndex: 0,
+			Guesses:   []string{},
+			Won:       false,
+			ExpiresAt: time.Now().Add(10 * time.Minute),
 		}
 		sessions[sessionID] = session
 	}
 	return session
+}
+
+// Cleanup expired sessions
+func startSessionCleanup(interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	for {
+		<-ticker.C
+		now := time.Now()
+		for id, session := range sessions {
+			if session.ExpiresAt.Before(now) {
+				delete(sessions, id)
+				log.Printf("Session %s expired and removed", id)
+			}
+		}
+	}
 }
 
 // Handler for the game logic
@@ -132,7 +140,6 @@ func game() http.Handler {
 		session := getSession(sessionID)
 
 		if r.Method == http.MethodPost {
-			// Handle the user's guess
 			err := r.ParseForm()
 			if err != nil {
 				http.Error(w, "Failed to parse form", http.StatusBadRequest)
@@ -144,34 +151,24 @@ func game() http.Handler {
 				return
 			}
 			session.Guesses = append(session.Guesses, userGuess)
-			if userGuess == session.KeyWord {
+
+			if strings.EqualFold(userGuess, session.KeyWord) {
 				session.Won = true
-			} else {
-				if session.HintIndex < len(session.Hints) {
-					session.HintIndex++
-				}
-				// Provide extra hints at certain attempts
-				if len(session.Guesses) == 3 {
-					session.ExtraHints = append(session.ExtraHints, fmt.Sprintf("Category: %s", session.Category))
-				}
-				if len(session.Guesses) == 5 {
-					session.ExtraHints = append(session.ExtraHints, fmt.Sprintf("Word Length: %d letters", len(session.KeyWord)))
-				}
+			} else if session.HintIndex < len(session.Hints) {
+				session.HintIndex++
 			}
+
 			sessions[sessionID] = session
 		}
 
-		// Ensure HintIndex is at least 1
 		if session.HintIndex == 0 {
 			session.HintIndex = 1
 		}
 
-		// Prepare data for the template
 		data := struct {
 			Title       string
 			CurrentHint string
 			AllHints    []string
-			ExtraHints  []string
 			Guesses     []string
 			Attempts    int
 			MaxAttempts int
@@ -181,51 +178,45 @@ func game() http.Handler {
 			Title:       "Word Guessing Game",
 			CurrentHint: session.Hints[session.HintIndex-1],
 			AllHints:    session.Hints[:session.HintIndex],
-			ExtraHints:  session.ExtraHints,
 			Guesses:     session.Guesses,
 			Attempts:    len(session.Guesses),
-			MaxAttempts: 20,
+			MaxAttempts: 5,
 			Won:         session.Won,
 			KeyWord:     session.KeyWord,
 		}
 
-		err := templates.ExecuteTemplate(w, "game", data)
-		if err != nil {
+		if err := templates.ExecuteTemplate(w, "game", data); err != nil {
 			http.Error(w, fmt.Sprintf("Failed to render template: %v", err), http.StatusInternalServerError)
-			return
 		}
 	})
 }
 
 func main() {
-	// Load the categories from words.json
 	file, err := os.Open("words.json")
 	if err != nil {
 		log.Fatalf("Failed to open words.json: %v", err)
 	}
 	defer file.Close()
 
-	decoder := json.NewDecoder(file)
 	var data struct {
 		Categories []Category `json:"categories"`
 	}
-	err = decoder.Decode(&data)
-	if err != nil {
+	if err := json.NewDecoder(file).Decode(&data); err != nil {
 		log.Fatalf("Failed to decode words.json: %v", err)
 	}
 	categories = data.Categories
 
-	rand.Seed(time.Now().UnixNano()) // Seed the random number generator
+	rand.Seed(time.Now().UnixNano())
 
-	// Set up the HTTP server and routes
+	go startSessionCleanup(1 * time.Minute)
+
 	mux := http.NewServeMux()
 	mux.Handle("/public/", logging(public()))
 	mux.Handle("/", logging(index()))
 	mux.Handle("/game", logging(game()))
 
-	// Port configuration
-	port, ok := os.LookupEnv("PORT")
-	if !ok {
+	port := os.Getenv("PORT")
+	if port == "" {
 		port = "8080"
 	}
 
@@ -238,8 +229,8 @@ func main() {
 		IdleTimeout:  15 * time.Second,
 	}
 
-	log.Println("main: running simple server on port", port)
+	log.Printf("main: running word guessing game server on port %s", port)
 	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("main: couldn't start simple server: %v\n", err)
+		log.Fatalf("main: couldn't start server: %v", err)
 	}
 }

@@ -49,6 +49,106 @@
       "category": "Profession",
       "key_word": "doctor",
       "hints": ["hospital", "patient", "medicine", "nurse", "surgery", "health", "clinic", "diagnose", "stethoscope", "cure"]
+    },
+    {
+      "category": "Flower",
+      "key_word": "rose",
+      "hints": ["red", "thorn", "fragrance", "petal", "garden", "valentine", "stem", "bloom", "romance", "bouquet"]
+    },
+    {
+      "category": "Beverage",
+      "key_word": "coffee",
+      "hints": ["bean", "brew", "caffeine", "cup", "morning", "espresso", "latte", "mug", "roast", "aroma"]
+    },
+    {
+      "category": "Weather",
+      "key_word": "rainbow",
+      "hints": ["colors", "sky", "rain", "sunlight", "arc", "spectrum", "after rain", "optics", "prism", "bow"]
+    },
+    {
+      "category": "Chemical Element",
+      "key_word": "gold",
+      "hints": ["metal", "precious", "yellow", "jewelry", "ring", "noble", "Au", "coin", "treasure", "soft"]
+    },
+    {
+      "category": "Body Part",
+      "key_word": "heart",
+      "hints": ["organ", "blood", "pump", "beat", "chest", "circulation", "love", "muscle", "cardio", "vessel"]
+    },
+    {
+      "category": "Historical Figure",
+      "key_word": "einstein",
+      "hints": ["scientist", "physics", "relativity", "genius", "theory", "german", "equation", "nobel", "hair", "e=mc²"]
+    },
+    {
+      "category": "City",
+      "key_word": "paris",
+      "hints": ["France", "Eiffel Tower", "city of lights", "Seine", "Louvre", "romantic", "Notre Dame", "beret", "baguette", "fashion"]
+    },
+    {
+      "category": "Emotion",
+      "key_word": "happiness",
+      "hints": ["joy", "smile", "pleasure", "content", "cheerful", "delight", "positive", "feeling", "laugh", "bliss"]
+    },
+    {
+      "category": "Furniture",
+      "key_word": "sofa",
+      "hints": ["couch", "seat", "living room", "comfort", "cushion", "relax", "recline", "fabric", "sit", "lounging"]
+    },
+    {
+      "category": "Natural Disaster",
+      "key_word": "earthquake",
+      "hints": ["shake", "tectonic", "plates", "seismic", "fault", "magnitude", "aftershock", "tremor", "disaster", "ground"]
+    },
+    {
+      "category": "Language",
+      "key_word": "spanish",
+      "hints": ["Spain", "Mexico", "Latin", "Hispanic", "hola", "dialect", "Castilian", "romance", "communication", "language"]
+    },
+    {
+      "category": "Insect",
+      "key_word": "butterfly",
+      "hints": ["wings", "caterpillar", "metamorphosis", "colorful", "flutter", "garden", "pollination", "antennae", "nectar", "insect"]
+    },
+    {
+      "category": "Gemstone",
+      "key_word": "diamond",
+      "hints": ["gem", "hard", "carbon", "engagement", "ring", "jewelry", "sparkle", "clear", "expensive", "cut"]
+    },
+    {
+      "category": "Clothing",
+      "key_word": "jacket",
+      "hints": ["wear", "coat", "zipper", "sleeve", "winter", "warm", "fashion", "outerwear", "pocket", "hood"]
+    },
+    {
+      "category": "Musical Genre",
+      "key_word": "jazz",
+      "hints": ["music", "saxophone", "improvisation", "blues", "swing", "rhythm", "New Orleans", "genre", "band", "instrument"]
+    },
+    {
+      "category": "Bird",
+      "key_word": "penguin",
+      "hints": ["Antarctica", "black and white", "swim", "flightless", "waddle", "cold", "ice", "tuxedo", "colony", "bird"]
+    },
+    {
+      "category": "Continent",
+      "key_word": "africa",
+      "hints": ["safari", "desert", "savannah", "wildlife", "Egypt", "Nile", "jungle", "tribe", "diamond", "continent"]
+    },
+    {
+      "category": "Mythical Creature",
+      "key_word": "dragon",
+      "hints": ["myth", "fire", "wings", "scales", "fantasy", "beast", "legend", "hoard", "castle", "knight"]
+    },
+    {
+      "category": "Vehicle Brand",
+      "key_word": "toyota",
+      "hints": ["car", "Japan", "automobile", "manufacturer", "Camry", "Corolla", "Prius", "reliable", "brand", "engine"]
+    },
+    {
+      "category": "Programming Language",
+      "key_word": "python",
+      "hints": ["code", "programming", "snake", "interpreted", "script", "developer", "Django", "syntax", "dynamic", "language"]
     }
   ]
 }
