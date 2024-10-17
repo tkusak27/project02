@@ -15,19 +15,27 @@ body {
 
 .game-area {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    justify-content: center;
+    align-items: center;
     margin-top: 20px;
+    padding: 10px; 
 }
 
 .side-panel {
     width: 25%;
+    padding: 10px;
     box-sizing: border-box;
+    background-color: #f9f9f9;
+    border-radius: 8px;
 }
 
 .center-panel {
-    width: 50%;
+    width: 40%;              /* Slightly reduce the width of the center panel */
+    padding: 20px;
     box-sizing: border-box;
+    background-color: #ffffff;
+    border: 1px solid #ddd;   /* Light border to separate the center panel */
+    border-radius: 8px;
 }
 
 .center-panel h1 {
@@ -54,15 +62,26 @@ li {
 }
 
 input[type="text"] {
-    width: 80%;
-    padding: 10px;
-    font-size: 16px;
-    box-sizing: border-box;
+    width: 90%;              /* Increase the width for a more centered feel */
+    padding: 12px;
+    font-size: 18px;
+    border-radius: 5px;      /* Rounded corners for a modern look */
+    border: 1px solid #ccc;
 }
 
 input[type="submit"] {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 12px 24px;
+    font-size: 18px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+input[type="submit"]:hover {
+    background-color: #2980b9;
 }
 
 h1, h2, h3 {
@@ -80,6 +99,21 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+/* Make sure lists look uniform */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    text-align: left;
+    margin: 5px 0;
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 @media (max-width: 768px) {

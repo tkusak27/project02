@@ -13,6 +13,7 @@
     <a href="/game">Play Again</a>
     {{else if lt .Attempts .MaxAttempts}}
     <div class="game-area">
+        <!-- Hints on the left -->
         <div class="side-panel hints">
             <h2>Hints Given</h2>
             <ul>
@@ -21,12 +22,16 @@
                 {{end}}
             </ul>
         </div>
+
+        <!-- Guess box in the center -->
         <div class="center-panel">
             <h1><strong>{{.CurrentHint}}</strong></h1>
             <form method="POST" action="/game">
                 <input type="text" name="guess" autofocus required>
                 <input type="submit" value="Guess">
             </form>
+
+            <!-- Extra hints section if applicable -->
             {{if .ExtraHints}}
             <div class="extra-hints">
                 <h3>Extra Hints:</h3>
@@ -38,6 +43,8 @@
             </div>
             {{end}}
         </div>
+
+        <!-- Guesses on the right -->
         <div class="side-panel guesses">
             <h2>Your Guesses</h2>
             <ul>
