@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -70,31 +69,30 @@ func loadCategories() {
 
 // Preload 5 random sessions from the categories
 func preloadSessions(count int) {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Seed the random number generator
+
+	// Shuffle the categories to ensure uniqueness
 	rand.Shuffle(len(categories), func(i, j int) {
 		categories[i], categories[j] = categories[j], categories[i]
 	})
 
-	var wg sync.WaitGroup
+	// Use the first few categories to create sessions
 	for i := 0; i < count && i < len(categories); i++ {
-		wg.Add(1)
-		go func(i int) {
-			defer wg.Done()
-			category := categories[i]
-			sessionID := fmt.Sprintf("preloaded-%d", i+1)
-			sessions[sessionID] = &Session{
-				Category:  category.Category,
-				KeyWord:   category.KeyWord,
-				Hints:     category.Hints,
-				HintIndex: 0,
-				Guesses:   []string{},
-				Won:       false,
-				ExpiresAt: time.Now().Add(10 * time.Minute),
-			}
-			log.Printf("Preloaded session %s: %s - %s", sessionID, category.Category, category.KeyWord)
-		}(i)
+		category := categories[i]
+		sessionID := fmt.Sprintf("preloaded-%d", i+1)
+
+		sessions[sessionID] = &Session{
+			Category:  category.Category,
+			KeyWord:   category.KeyWord,
+			Hints:     category.Hints,
+			HintIndex: 0,
+			Guesses:   []string{},
+			Won:       false,
+			ExpiresAt: time.Now().Add(10 * time.Minute),
+		}
+
+		log.Printf("Preloaded session %s: %s - %s", sessionID, category.Category, category.KeyWord)
 	}
-	wg.Wait() // Wait for all goroutines to complete
 }
 
 // Middleware for logging requests
@@ -207,26 +205,34 @@ func game() http.Handler {
 				return
 			}
 			userGuess := r.FormValue("guess")
+			if userGuess == "" {
+				http.Error(w, "Guess cannot be empty", http.StatusBadRequest)
+				return
+			}
+			session.Guesses = append(session.Guesses, userGuess)
 
-			go func() {
-				session.Guesses = append(session.Guesses, userGuess)
-				if strings.EqualFold(userGuess, session.KeyWord) {
-					session.Won = true
-				} else if session.HintIndex < len(session.Hints) {
-					session.HintIndex++
-				}
-				sessions[sessionID] = session
-			}()
+			if strings.EqualFold(userGuess, session.KeyWord) {
+				session.Won = true
+			} else if session.HintIndex < len(session.Hints) {
+				session.HintIndex++
+			}
+
+			sessions[sessionID] = session
 		}
 
-		// Prepare data for rendering
+		if session.HintIndex == 0 {
+			session.HintIndex = 1
+		}
+
 		data := struct {
-			Title, CurrentHint    string
-			AllHints              []string
-			Guesses               []string
-			Attempts, MaxAttempts int
-			Won                   bool
-			KeyWord               string
+			Title       string
+			CurrentHint string
+			AllHints    []string
+			Guesses     []string
+			Attempts    int
+			MaxAttempts int
+			Won         bool
+			KeyWord     string
 		}{
 			Title:       "Word Guessing Game",
 			CurrentHint: session.Hints[session.HintIndex-1],
